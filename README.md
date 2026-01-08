@@ -38,8 +38,8 @@ Dans votre projet ou dans un nouveau projet Symfony (ici on va utiliser un nouve
 ```sh
 symfony new projettestbundle --version="lts" --webapp
 cd projettestbundle
-mkdir -p bundle/Amu/
-cd bundle/Amu
+mkdir -p bundle/Entreprise/
+cd bundle/Entreprise
 git clone # + adresse du dépôt du bundle
 mv skeletonbundle SkeletonBundle # On renomme le dossier
 ```
@@ -51,7 +51,7 @@ Puis dans `composer.json` du projet Symfony (**Pas celui du bundle**), ajoutez :
     "repositories": [
         {
             "type": "path",
-            "url": "./bundle/Amu/SkeletonBundle"
+            "url": "./bundle/Entreprise/SkeletonBundle"
         }
     ],
 ```
@@ -59,7 +59,7 @@ Puis dans `composer.json` du projet Symfony (**Pas celui du bundle**), ajoutez :
 Puis
 
 ```sh
-composer require amu/skeleton-bundle
+composer require Entreprise/skeleton-bundle
 ```
 
 Si tout se passe bien, vous pouvez maintenant utiliser votre bundle dans votre application Symfony, faire votre développement, sans avoir à versionner puis `composer update` dans votre application Symfony.
@@ -74,7 +74,7 @@ class (relative to composer.json) as value. As the main class is located in the 
 {
   "autoload": {
     "psr-4": {
-      "Amu\\SkeletonBundle\\": "src/"
+      "Entreprise\\SkeletonBundle\\": "src/"
     }
   }
 }
@@ -82,10 +82,10 @@ class (relative to composer.json) as value. As the main class is located in the 
 
 - Pour les fichiers yaml de services/configuration, je cite la doc
   symfony : `The root key of your bundle configuration (acme_social in the previous example) is automatically determined from your bundle name (it's the snake case of the bundle name without the Bundle suffix).`
-  Pour notre exemple, il faut donc utiliser `amu_skeleton` comme clé (important pour le fichier de configuration
+  Pour notre exemple, il faut donc utiliser `Entreprise_skeleton` comme clé (important pour le fichier de configuration
   notamment).
 
-- Pour vérifier le format de la configuration (Celle défini dans AmuSkeletonBundle.php)
+- Pour vérifier le format de la configuration (Celle défini dans EntrepriseSkeletonBundle.php)
 
 ```sh
 symfony console config:dump-reference
@@ -97,24 +97,24 @@ symfony console config:dump-reference
 symfony console debug:config
 ```
 
-## AmuSkeletonBundle.php
+## EntrepriseSkeletonBundle.php
 
 ```php
 <?php
 
-namespace Amu\SkeletonBundle;
+namespace Entreprise\SkeletonBundle;
 
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 
-class AmuSkeletonBundle extends AbstractBundle {}
+class EntrepriseSkeletonBundle extends AbstractBundle {}
 ```
 
 ## Ajouter une configuration
 
-- On définit notre arbre de configuration dans `AmuSkeletonBundle.php`
+- On définit notre arbre de configuration dans `EntrepriseSkeletonBundle.php`
 
 ```php
-class AmuSkeletonBundle extends AbstractBundle
+class EntrepriseSkeletonBundle extends AbstractBundle
 {
     public function configure(DefinitionConfigurator $definition): void
     {
@@ -130,23 +130,23 @@ class AmuSkeletonBundle extends AbstractBundle
     }
 ```
 
-- On demande à charger la configuration dans `AmuSkeletonBundle.php`
+- On demande à charger la configuration dans `EntrepriseSkeletonBundle.php`
 
 ```php
-class AmuSkeletonBundle extends AbstractBundle
+class EntrepriseSkeletonBundle extends AbstractBundle
 {
     public function loadExtension(array $config, ContainerConfigurator $containerConfigurator, ContainerBuilder $containerBuilder): void
     {
         // On ajoute notre tableau de configuration à nos parameters
         $containerConfigurator->parameters()
-            ->set('amu_skeleton_config', $config['rules']);
+            ->set('entreprise_skeleton_config', $config['rules']);
     }
 ```
 
-- Créer le fichier `config/packages/amu_skeleton.yaml` qui correspond à votre arbre de configuration.
+- Créer le fichier `config/packages/entreprise_skeleton.yaml` qui correspond à votre arbre de configuration.
 
 ```yaml
-amu_skeleton:
+entreprise_skeleton:
   rules:
     rule1: 1
     rule2: "toto"
@@ -160,7 +160,7 @@ Symfony).
 ## Gestion des services
 
 - On a besoin du fichier `config/services.yaml`.
-- Dans `AmuSkeletonBundle.php`, importer le fichier (Pour le coup, ce fichier est bien "chargé" automatiquement par
+- Dans `EntrepriseSkeletonBundle.php`, importer le fichier (Pour le coup, ce fichier est bien "chargé" automatiquement par
   Symfony).
 
 ```php
@@ -173,7 +173,15 @@ Symfony).
 - Définir vos services dans `config/services.yaml`.
 
 ## Gestion des contrôleurs/routes.
-
+Dans config/routes/entreprise_skeleton.yaml
+```yml
+amu_skeleton:
+  resource:
+    path: '@EntrepriseSkeletonBundle/src/Controller/'
+    namespace: Entreprise\SkeletonBundle\Controller
+  type: attribute
+  prefix: entreprise_skeleton
+```
 - Un controller est un service. Mettre en place la gestion des services.
 - La gestion des routes n'est pas automatique. Le fichier dans `config/routes/` n'est pas chargé automatiquement. Il
   faut donc soit mettre en place une recette, mais c'est contraignant, soit vous mettez dans la doc d'installation qu'il
